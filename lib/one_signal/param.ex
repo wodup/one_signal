@@ -22,7 +22,9 @@ defmodule OneSignal.Param do
             firefox_params: nil,
             send_after: nil,
             url: nil,
-            subtitle: nil
+            subtitle: nil,
+            ios_badgeType: nil,
+            ios_badgeCount: nil
 
   defp to_string_key({k, v}) do
     {to_string(k), v}
@@ -296,5 +298,27 @@ defmodule OneSignal.Param do
 
   def put_subtitle(param, subtitle) do
     %{param | subtitle: subtitle}
+  end
+
+  @doc """
+  Set ios_badgeType and ios_badgeCount
+
+  Describes whether to set or increase/decrease your app's iOS badge count by
+  the ios_badgeCount specified count. Can specify None, SetTo, or Increase.
+
+  None leaves the count unaffected.
+
+  SetTo directly sets the badge count to the number specified in ios_badgeCount.
+
+  Increase adds the number specified in ios_badgeCount to the total. Use a
+  negative number to decrease the badge count.
+  """
+  def put_ios_badge(param, "None") do
+    %{param | ios_badgeType: "None", ios_badgeCount: nil}
+  end
+
+  def put_ios_badge(param, badgeType, badgeCount)
+      when badgeType in ["SetTo", "Increase"] and is_integer(badgeCount) do
+    %{param | ios_badgeType: badgeType, ios_badgeCount: badgeCount}
   end
 end
