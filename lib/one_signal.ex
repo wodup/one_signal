@@ -14,7 +14,7 @@ defmodule OneSignal do
     Supervisor.start_link(children, opts)
   end
 
-  def endpoint, do: "https://onesignal.com/api/v1"
+  def endpoint, do: config()[:endpoint] || "https://onesignal.com/api/v1"
 
   def new do
     %OneSignal.Param{}

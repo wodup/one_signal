@@ -14,6 +14,9 @@ defmodule OneSignal.Param do
             filters: [],
             tags: nil,
             data: nil,
+            collapse_id: nil,
+            thread_id: nil,
+            summary_arg: nil,
             ios_params: nil,
             android_params: nil,
             adm_params: nil,
@@ -24,7 +27,8 @@ defmodule OneSignal.Param do
             url: nil,
             subtitle: nil,
             ios_badgeType: nil,
-            ios_badgeCount: nil
+            ios_badgeCount: nil,
+            ios_attachments: nil
 
   defp to_string_key({k, v}) do
     {to_string(k), v}
@@ -298,6 +302,42 @@ defmodule OneSignal.Param do
 
   def put_subtitle(param, subtitle) do
     %{param | subtitle: subtitle}
+  end
+
+  @doc """
+  Set collapse_id.
+  """
+  def put_collapse_id(param, nil), do: param
+
+  def put_collapse_id(param, collapse_id) do
+    %{param | collapse_id: collapse_id}
+  end
+
+  @doc """
+  Set thread_id.
+  """
+  def put_thread_id(param, nil), do: param
+
+  def put_thread_id(param, thread_id) do
+    %{param | thread_id: thread_id}
+  end
+
+  @doc """
+  Set summary_arg.
+  """
+  def put_summary_arg(param, nil), do: param
+
+  def put_summary_arg(param, summary_arg) do
+    %{param | summary_arg: summary_arg}
+  end
+
+  @doc """
+  Set ios_attachments.
+  """
+  def put_ios_attachments(param, nil), do: param
+
+  def put_ios_attachments(param, ios_attachments) do
+    %{param | ios_attachments: ios_attachments}
   end
 
   @doc """
