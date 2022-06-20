@@ -14,7 +14,18 @@ defmodule OneSignal do
     Supervisor.start_link(children, opts)
   end
 
-  def endpoint, do: config()[:endpoint] || "https://onesignal.com/api/v1"
+  def endpoint, do: (config()[:endpoint] || "https://onesignal.com/api/v1") |> expand_value()
+
+  defp expand_value({module, function, args})
+       when is_atom(function) and is_list(args) do
+    apply(module, function, args)
+  end
+
+  defp expand_value(value) when is_function(value) do
+    value.()
+  end
+
+  defp expand_value(value), do: value
 
   def new do
     %OneSignal.Param{}
