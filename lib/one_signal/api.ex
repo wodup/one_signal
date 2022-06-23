@@ -7,7 +7,7 @@ defmodule OneSignal.API do
       url = "#{url}?#{query}"
     end
 
-    HTTPoison.get!(url, OneSignal.auth_header())
+    HTTPoison.get(url, OneSignal.auth_header())
     |> handle_response
   end
 
@@ -16,23 +16,23 @@ defmodule OneSignal.API do
 
     req_body = Poison.encode!(body)
 
-    HTTPoison.post!(url, req_body, OneSignal.auth_header())
+    HTTPoison.post(url, req_body, OneSignal.auth_header())
     |> handle_response
   end
 
   def delete(url) do
     HTTPoison.start()
 
-    HTTPoison.delete!(url, OneSignal.auth_header())
+    HTTPoison.delete(url, OneSignal.auth_header())
     |> handle_response
   end
 
-  defp handle_response(%HTTPoison.Response{body: body, status_code: code})
+  defp handle_response({:ok, %HTTPoison.Response{body: body, status_code: code}})
        when code in 200..299 do
     {:ok, Poison.decode!(body)}
   end
 
-  defp handle_response(%HTTPoison.Response{body: body, status_code: code}) do
+  defp handle_response({:ok, %HTTPoison.Response{body: body, status_code: code}}) do
     case Poison.decode(body) do
       {:ok, error} ->
         {:error, %{error: error, status: code}}
@@ -40,5 +40,9 @@ defmodule OneSignal.API do
       {:error, _error} ->
         {:error, %{error: :json_decode_error, body: body, status: code}}
     end
+  end
+
+  defp handle_response({:error, %HTTPoison.Error{reason: reason}}) do
+    {:error, reason}
   end
 end
