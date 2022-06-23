@@ -1,38 +1,44 @@
 defmodule OneSignal.API do
-
   def get(url, query \\ []) do
-    HTTPoison.start
+    HTTPoison.start()
     query = OneSignal.Utils.encode_body(query)
 
     unless String.length(query) == 0 do
       url = "#{url}?#{query}"
     end
 
-    HTTPoison.get!(url, OneSignal.auth_header)
+    HTTPoison.get!(url, OneSignal.auth_header())
     |> handle_response
   end
 
   def post(url, body) do
-    HTTPoison.start
+    HTTPoison.start()
 
     req_body = Poison.encode!(body)
 
-    HTTPoison.post!(url, req_body, OneSignal.auth_header)
+    HTTPoison.post!(url, req_body, OneSignal.auth_header())
     |> handle_response
   end
 
   def delete(url) do
-    HTTPoison.start
-    HTTPoison.delete!(url, OneSignal.auth_header)
+    HTTPoison.start()
+
+    HTTPoison.delete!(url, OneSignal.auth_header())
     |> handle_response
   end
 
-  defp handle_response(%HTTPoison.Response{body: body, status_code: code}) when code in 200..299 do
+  defp handle_response(%HTTPoison.Response{body: body, status_code: code})
+       when code in 200..299 do
     {:ok, Poison.decode!(body)}
   end
 
-  defp handle_response(%HTTPoison.Response{body: body, status_code: _}) do
-    {:error, Poison.decode!(body)}
-  end
+  defp handle_response(%HTTPoison.Response{body: body, status_code: code}) do
+    case Poison.decode(body) do
+      {:ok, error} ->
+        {:error, %{error: error, status: code}}
 
+      {:error, _error} ->
+        {:error, %{error: :json_decode_error, body: body, status: code}}
+    end
+  end
 end
